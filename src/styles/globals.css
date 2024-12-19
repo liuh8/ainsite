@@ -4,9 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 :root {
-    --background: #000000;
-    --foreground: #ffffff;
-    --primary: #1da1f2;
+    --background: #1a1a1a;
+    --foreground: #f0f0f0;
+    --primary: #ff9999;
 }
   
 body {
