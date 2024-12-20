@@ -27,7 +27,9 @@ export default function Projects() {
     useEffect(() => {
         const handleScroll = () => {
             const scrollY = window.scrollY;
-            const scrollPosition = scrollY + 100;
+            const scrollPosition = scrollY + window.innerHeight;
+            const bodyHeight = document.body.offsetHeight;
+
             let currentProjectId = null;
             const projectsInView = Object.keys(sectionRefs.current)
                 .map(projectId => {
@@ -41,18 +43,24 @@ export default function Projects() {
                 .filter(Boolean)
                 .sort((a, b) => a.offsetTop - b.offsetTop);
 
-            if (scrollY < 100 && projectsInView.length > 0) {
-                currentProjectId = projectsInView[0].projectId;
+            const isAtBottom = scrollPosition >= bodyHeight - 2;
+            if (isAtBottom && projectsInView.length > 0) {
+                currentProjectId = projectsInView[projectsInView.length - 1].projectId;
             } else {
-                for (let i = 0; i < projectsInView.length; i++) {
-                    const { projectId, offsetTop } = projectsInView[i];
-                    if (scrollPosition >= offsetTop) {
-                        currentProjectId = projectId;
-                    } else {
-                        break;
+                if (scrollY < 100 && projectsInView.length > 0) {
+                    currentProjectId = projectsInView[0].projectId;
+                } else {
+                    for (let i = 0; i < projectsInView.length; i++) {
+                        const { projectId, offsetTop } = projectsInView[i];
+                        if (scrollY + 100 >= offsetTop) {
+                            currentProjectId = projectId;
+                        } else {
+                            break;
+                        }
                     }
                 }
             }
+
             if (currentProjectId) {
                 const project = Object.values(projects)
                     .flat()
@@ -70,25 +78,26 @@ export default function Projects() {
     }, [selectedProject]);
 
     return (
-        <div className="min-h-screen bg-background text-foreground px-6 md:px-20 lg:px-40 py-8 flex flex-col">
+        <div className="min-h-screen bg-background text-foreground px-8 lg:px-24 py-12 flex justify-center">
             <Head>
-                <title>My Projects</title>
+                <title>AinSite - My Projects</title>
             </Head>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-center text-foreground">
-                My Projects
-            </h2>
-            <div className="flex flex-col md:flex-row flex-grow">
-                <div className="md:w-1/3 w-full md:pr-8 mb-8 md:mb-0">
-                    <div className="md:sticky md:top-4">
-                        <Timeline
-                            projects={projects}
-                            selectedProject={selectedProject}
-                            setSelectedProject={setSelectedProject}
-                        />
-                    </div>
+            <div className="flex w-full max-w-7xl">
+                <div className="w-1/3 hidden lg:block lg:sticky lg:top-24 lg:self-start">
+                    <Timeline
+                        projects={projects}
+                        selectedProject={selectedProject}
+                        setSelectedProject={setSelectedProject}
+                    />
                 </div>
-
-                <div className="md:w-2/3 w-full overflow-auto">
+                <div className="w-full lg:hidden mb-8">
+                    <Timeline
+                        projects={projects}
+                        selectedProject={selectedProject}
+                        setSelectedProject={setSelectedProject}
+                    />
+                </div>
+                <div className="w-full lg:w-2/3 lg:ml-8">
                     <ProjectDetails projects={projects} selectedProject={selectedProject} />
                 </div>
             </div>
